@@ -5,6 +5,12 @@ on:
     - cron: "0 13 * * *"
 
   workflow_dispatch:
+    inputs:
+      test_mode:
+        description: "Send a test Discord notification"
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: write
@@ -28,6 +34,7 @@ jobs:
       - name: Check for new internships
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          TEST_MODE: ${{ inputs.test_mode }}
         run: python scraper.py
 
       - name: Save seen internships

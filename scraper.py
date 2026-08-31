@@ -178,6 +178,18 @@ def send_discord(job):
     response.raise_for_status()
 
 
+def send_test_notification():
+    test_job = {
+        "company": "Test Company",
+        "role": "Software Engineer Intern",
+        "location": "New York, NY",
+        "link": "https://github.com/SimplifyJobs/Summer2027-Internships",
+    }
+
+    print("Sending test internship notification...")
+    send_discord(test_job)
+    print("Test notification sent!")
+
 def main():
     print("Checking SimplifyJobs...")
 
@@ -225,4 +237,7 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    if os.getenv("TEST_MODE") == "true":
+        send_test_notification()
+    else:
+        main()
