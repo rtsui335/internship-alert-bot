@@ -3,7 +3,7 @@
 
 Welcome! This is a Discord bot designed to automatically track, scrape, and post real-time internship opportunities to keep members of **StackHacks** ahead of the application curve. 
 
-Built with ❤️ by **Ryan Tsui** (Director of Professional Development).
+Built with ❤️ (def not vibe coded) by **Ryan Tsui** (Director of Professional Development).
 
 ---
 
