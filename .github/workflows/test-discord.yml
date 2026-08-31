@@ -1,0 +1,35 @@
+name: Test Discord Webhook
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test-discord:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Test Discord webhook
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          curl -H "Content-Type: application/json" \
+            -d '{
+              "embeds": [{
+                "title": "🚀 Internship Bot is Online!",
+                "description": "GitHub Actions successfully connected to Discord.",
+                "fields": [
+                  {
+                    "name": "Status",
+                    "value": "✅ Webhook working"
+                  },
+                  {
+                    "name": "Next Step",
+                    "value": "Start monitoring Summer 2027 internships 👀"
+                  }
+                ],
+                "footer": {
+                  "text": "Summer 2027 Internship Monitor"
+                }
+              }]
+            }' \
+            "$DISCORD_WEBHOOK_URL"
