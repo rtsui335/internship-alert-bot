@@ -1,8 +1,8 @@
-name: Daily Internship Check
+name: Internship Check
 
 on:
   schedule:
-    - cron: "0 13 * * *"
+    - cron: "0 */3 * * *"
 
   workflow_dispatch:
     inputs:
