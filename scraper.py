@@ -177,7 +177,7 @@ def send_discord(job):
     response = requests.post(WEBHOOK_URL, json=payload, timeout=30)
     response.raise_for_status()
 
-
+#test
 def send_test_notification():
     test_job = {
         "company": "Test Company",
@@ -189,6 +189,7 @@ def send_test_notification():
     print("Sending test internship notification...")
     send_discord(test_job)
     print("Test notification sent!")
+
 
 def main():
     print("Checking SimplifyJobs...")
