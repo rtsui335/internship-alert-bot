@@ -5,12 +5,6 @@ on:
     - cron: "0 */3 * * *"
 
   workflow_dispatch:
-    inputs:
-      test_mode:
-        description: "Send a test Discord notification"
-        required: false
-        default: false
-        type: boolean
 
 permissions:
   contents: write
