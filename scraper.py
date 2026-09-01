@@ -15,26 +15,76 @@ SOURCE_URL = (
 SEEN_FILE = Path("seen_jobs.json")
 WEBHOOK_URL = os.getenv("DISCORD_WEBHOOK_URL")
 
-# Roles we're interested in
-KEYWORDS = [
-    "software",
-    "software engineer",
-    "software engineering",
-    "developer",
-    "full stack",
-    "fullstack",
-    "backend",
-    "back end",
-    "frontend",
-    "front end",
-    "data engineer",
-    "data science",
-    "machine learning",
-    "artificial intelligence",
-    " ai ",
-    " ml ",
-]
+# Roles for now are SWE and Data Science related. This can be expanded later
 
+ROLE_CATEGORIES = {
+    "Software Engineering": [
+        "software engineer",
+        "software engineering",
+        "software developer",
+        "swe intern",
+        "full stack",
+        "fullstack",
+        "backend",
+        "back end",
+        "frontend",
+        "front end",
+        "web developer",
+        "mobile engineer",
+        "ios engineer",
+        "android engineer",
+    ],
+
+    "AI / Machine Learning": [
+        "machine learning",
+        "ml engineer",
+        "artificial intelligence",
+        "ai engineer",
+        "computer vision",
+        "deep learning",
+        "nlp",
+        "natural language processing",
+    ],
+
+    "Data": [
+        "data engineer",
+        "data scientist",
+        "data science",
+        "analytics engineer",
+        "data platform",
+    ],
+
+    "Cloud / Infrastructure": [
+        "cloud engineer",
+        "platform engineer",
+        "devops",
+        "site reliability",
+        "sre",
+        "infrastructure engineer",
+        "infrastructure software",
+    ],
+
+    "Cybersecurity": [
+        "security engineer",
+        "cybersecurity",
+        "cyber security",
+        "application security",
+        "information security",
+        "security analyst",
+        "product security",
+    ],
+
+    "Systems / Firmware": [
+        "firmware engineer",
+        "firmware",
+        "embedded software",
+        "embedded systems",
+        "systems software",
+        "system software",
+        "kernel",
+        "operating systems",
+    ],
+}
 
 def get_readme():
     response = requests.get(SOURCE_URL, timeout=30)
@@ -114,10 +164,18 @@ def parse_jobs(readme):
     return jobs
 
 
-def is_relevant(job):
-    text = f" {job['role'].lower()} "
+def get_category(job):
+    role = job["role"].lower()
 
-    return any(keyword in text for keyword in KEYWORDS)
+    for category, keywords in ROLE_CATEGORIES.items():
+        if any(keyword in role for keyword in keywords):
+            return category
+
+    return None
+
+
+def is_relevant(job):
+    return get_category(job) is not None
 
 
 def job_id(job):
@@ -141,14 +199,15 @@ def save_seen(seen):
 
 
 def send_discord(job):
+    category = get_category(job) or "Other"
     if not WEBHOOK_URL:
         raise RuntimeError("DISCORD_WEBHOOK_URL is not set.")
 
     payload = {
         "embeds": [
             {
-                "title": "🚨 New Summer 2027 Internship",
-                "description": f"**{job['role']}**",
+                "title": "Alert: New Summer 2027 Internship",
+                "description": f"{category}\n\n**{job['role']}**",
                 "url": job["link"],
                 "fields": [
                     {
@@ -225,7 +284,7 @@ def main():
     print(f"Found {len(new_jobs)} new internships.")
 
     for job in new_jobs:
-        print(f"NEW: {job['company']} - {job['role']}")
+        print(f"NEW: [{get_category(job)}] {job['company']} - {job['role']}")
 
         send_discord(job)
         seen.add(job_id(job))
