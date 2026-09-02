@@ -1,41 +1,30 @@
-# internship-alert-bot
-# 🤖 Internship Alert Bot
-
-Welcome! This is a Discord bot designed to automatically track, scrape, and post real-time internship opportunities to keep members of **StackHacks** ahead of the application curve. 
-
-Built with ❤️ (def not vibe coded) by **Ryan Tsui** (Director of Professional Development).
+An automated monitoring and notification system designed to track, scrape, and dispatch real-time internship opportunities to keep **StackHacks** members ahead of the application process.
 
 ---
 
-## 📌 Features
+## Key Features
 
-* **Automated Job Scraping:** Continuously checks for new internship postings across target job boards and repositories.
-* **Instant Discord Alerts:** Sends rich embedded notifications directly to designated Discord channels as soon as new listings are found.
-* **Duplicate Prevention:** Tracks previously seen listings (`seen_jobs.json`) to prevent spamming duplicate alerts.
-* **Custom Filters:** Configurable search parameters for specific roles, locations, or technical stacks.
-
----
-
-## 🛠️ Tech Stack & Dependencies
-
-* **Language:** Python 3.x
-* **Scraper:** BeautifulSoup4 / Requests / Selenium
-* **Discord Integration:** `discord.py` / Webhooks
-* **Storage:** JSON key-value tracking (`seen_jobs.json`)
+* **Automated Web Scraping:** Continuously monitors target job boards and career repositories for new internship postings.
+* **Instant Discord Alerts:** Sends formatted, rich embed notifications directly to designated channels upon detecting new listings.
+* **Deduplication Engine:** Leverages persistent state tracking (`seen_jobs.json`) to prevent duplicate alerts and redundant notifications.
+* **Configurable Filtering:** Tailor search criteria based on specific role titles, locations, technologies, or keywords.
 
 ---
 
-## 🚀 Quick Start & Setup
+## Tech Stack
 
-### 1. Prerequisites
-Ensure you have Python 3.8+ installed on your machine.
+* **Core:** Python 3.8+
+* **Scraping & Parsing:** BeautifulSoup4, Requests, Selenium
+* **Integration:** `discord.py`, Webhooks
+* **Storage:** JSON File-based Key-Value Store
 
-### 2. Installation
-Clone the repository and install the required dependencies:
+---
+
+## Getting Started
+
+### Prerequisites
+
+Ensure you have Python 3.8 or higher installed on your environment.
 
 ```bash
-git clone [https://github.com/rtsui335/internship-alert-bot.git](https://github.com/rtsui335/internship-alert-bot.git)
-cd internship-alert-bot
-pip install -r requirements.txt
-
--Ryan Tsui
+python --version
