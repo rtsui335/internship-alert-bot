@@ -119,47 +119,40 @@ def extract_link(text):
 def parse_jobs(readme):
     jobs = []
 
-    for line in readme.splitlines():
+    soup = BeautifulSoup(readme, "html.parser")
 
-        # Internship rows are markdown/HTML table rows
-        if not line.startswith("|"):
-            continue
+    for row in soup.find_all("tr"):
+        columns = row.find_all("td")
 
-        columns = [column.strip() for column in line.split("|")[1:-1]]
-
+        # Expected:
+        # Company | Role | Location | Application | Age
         if len(columns) < 4:
             continue
 
-        company_raw = columns[0]
-        role_raw = columns[1]
-        location_raw = columns[2]
-        application_raw = columns[3]
+        company = columns[0].get_text(" ", strip=True)
+        role = columns[1].get_text(" ", strip=True)
+        location = columns[2].get_text(", ", strip=True)
 
-        company = clean_markdown(company_raw)
-        role = clean_markdown(role_raw)
-        location = clean_markdown(location_raw)
+        # Simplify sometimes uses ↳ for another position
+        # at the same company.
+        if company == "↳":
+            company = "Same company as above"
 
-        # Ignore table headers
-        if company.lower() == "company":
+        application_links = columns[3].find_all("a", href=True)
+
+        if not application_links:
             continue
 
-        if "---" in company:
-            continue
+        # First link is normally the direct employer application.
+        link = application_links[0]["href"]
 
-        link = extract_link(application_raw)
-
-        # Rows without an application link aren't useful for our alerts
-        if not link:
-            continue
-
-        jobs.append(
-            {
-                "company": company,
-                "role": role,
-                "location": location,
-                "link": link,
-            }
-        )
+        jobs.append({
+            "company": company,
+            "role": role,
+            "location": location,
+            "link": link,
+            "source": "Simplify",
+        })
 
     return jobs
 
@@ -267,11 +260,17 @@ def main():
     # mark everything currently listed as seen.
     # This prevents 100+ Discord notifications.
     if not seen:
+        if not relevant_jobs:
+            print("ERROR: No jobs were parsed.")
+            print("Refusing to initialize an empty database.")
+            return
+
         seen = {job_id(job) for job in relevant_jobs}
+
         save_seen(seen)
 
-        print("First run complete.")
-        print(f"Initialized database with {len(seen)} existing jobs.")
+        print("Initial job database created.")
+        print(f"Saved {len(seen)} existing internships.")
         print("No Discord notifications sent.")
         return
 
