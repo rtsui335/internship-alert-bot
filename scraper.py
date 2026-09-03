@@ -5,6 +5,7 @@ import re
 from pathlib import Path
 
 import requests
+from bs4 import BeautifulSoup
 
 
 SOURCE_URL = (
@@ -118,6 +119,7 @@ def extract_link(text):
 
 def parse_jobs(readme):
     jobs = []
+    current_company = None
 
     soup = BeautifulSoup(readme, "html.parser")
 
@@ -136,7 +138,12 @@ def parse_jobs(readme):
         # Simplify sometimes uses ↳ for another position
         # at the same company.
         if company == "↳":
-            company = "Same company as above"
+            if current_company is None:
+                # A continuation row without a preceding company is malformed.
+                continue
+            company = current_company
+        else:
+            current_company = company
 
         application_links = columns[3].find_all("a", href=True)
 
@@ -182,13 +189,24 @@ def load_seen():
     if not SEEN_FILE.exists():
         return set()
 
-    with open(SEEN_FILE, "r") as file:
-        return set(json.load(file))
+    try:
+        with SEEN_FILE.open("r", encoding="utf-8") as file:
+            data = json.load(file)
+    except (OSError, json.JSONDecodeError) as error:
+        raise RuntimeError(f"Could not read {SEEN_FILE}: {error}") from error
+
+    if not isinstance(data, list) or not all(isinstance(item, str) for item in data):
+        raise RuntimeError(f"{SEEN_FILE} must contain a JSON list of job IDs.")
+
+    return set(data)
 
 
 def save_seen(seen):
-    with open(SEEN_FILE, "w") as file:
+    temporary_file = SEEN_FILE.with_suffix(".tmp")
+    with temporary_file.open("w", encoding="utf-8") as file:
         json.dump(sorted(seen), file, indent=2)
+        file.write("\n")
+    temporary_file.replace(SEEN_FILE)
 
 
 def send_discord(job):
@@ -229,7 +247,6 @@ def send_discord(job):
     response = requests.post(WEBHOOK_URL, json=payload, timeout=30)
     response.raise_for_status()
 
-#test
 def send_test_notification():
     test_job = {
         "company": "Test Company",
@@ -287,9 +304,10 @@ def main():
 
         send_discord(job)
         seen.add(job_id(job))
+        # Persist after every successful notification. If a later webhook call
+        # fails, already-notified jobs will not be sent again on the next run.
+        save_seen(seen)
 
-    # Also remember currently existing jobs even if they don't match
-    # future filters.
     save_seen(seen)
 
     print("Done!")
