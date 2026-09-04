@@ -15,7 +15,7 @@ SAMPLE_TABLE = """
     <td>New York<br>Remote</td><td><a href="https://example.com/one">Apply</a></td>
   </tr>
   <tr>
-    <td>↳</td><td>Data Scientist Intern</td><td>Boston</td>
+    <td>\u21b3</td><td>Data Scientist Intern</td><td>Boston</td>
     <td><a href="https://example.com/two">Apply</a></td>
   </tr>
 </table>
@@ -32,7 +32,7 @@ class ScraperTests(unittest.TestCase):
         self.assertEqual(jobs[1]["link"], "https://example.com/two")
 
     def test_parse_jobs_skips_orphaned_continuation(self):
-        html = '<table><tr><td>↳</td><td>Software Engineer</td><td>Remote</td>' \
+        html = '<table><tr><td>\u21b3</td><td>Software Engineer</td><td>Remote</td>' \
                '<td><a href="https://example.com/job">Apply</a></td></tr></table>'
         self.assertEqual(scraper.parse_jobs(html), [])
 

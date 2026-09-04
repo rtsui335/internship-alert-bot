@@ -135,9 +135,9 @@ def parse_jobs(readme):
         role = columns[1].get_text(" ", strip=True)
         location = columns[2].get_text(", ", strip=True)
 
-        # Simplify sometimes uses ↳ for another position
+        # Simplify uses a continuation marker for another position
         # at the same company.
-        if company == "↳":
+        if company == "\u21b3":
             if current_company is None:
                 # A continuation row without a preceding company is malformed.
                 continue
@@ -222,17 +222,17 @@ def send_discord(job):
                 "url": job["link"],
                 "fields": [
                     {
-                        "name": "🏢 Company",
+                        "name": "Company",
                         "value": job["company"],
                         "inline": True,
                     },
                     {
-                        "name": "📍 Location",
+                        "name": "Location",
                         "value": job["location"],
                         "inline": True,
                     },
                     {
-                        "name": "🔗 Application",
+                        "name": "Application",
                         "value": f"[Apply Here]({job['link']})",
                         "inline": False,
                     },
